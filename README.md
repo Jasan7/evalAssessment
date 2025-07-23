@@ -1,12 +1,48 @@
-# React + Vite
+# Real-Time BTC/USDT Price Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based application that connects to the Binance WebSocket API to display real-time BTC/USDT trade prices.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Live price updates** via WebSocket
+- **Search functionality** to look up different coins
+- **Auto-updating** UI with color-coded indicators (up/down/neutral)
+- **Tailwind CSS for sleek styling**
+- 💻 **Deployed on Vercel** for easy access
+- Clean React architecture with `useEffect` and `useRef` for WebSocket lifecycle handling
 
-## Expanding the ESLint configuration
+## Try It Live
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+[Live App on Vercel](https://eval-assessment.vercel.app/)
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+
+```
+### 3. Start the app
+
+```bash
+npm run dev
+
+```
+Then visit http://localhost:5173 in your browser.
+
+## Technologies Used
+
+- React
+- JavaScript
+- [Binance](https://github.com/binance/binance-spot-api-docs) and [Coingecko](https://www.coingecko.com/en/api) WebSocket API
+- Tailwind CSS 
+- Vercel (for deployment) 
