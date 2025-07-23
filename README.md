@@ -8,7 +8,7 @@ A React-based application that connects to the Binance WebSocket API to display 
 - **Search functionality** to look up different coins
 - **Auto-updating** UI with color-coded indicators (up/down/neutral)
 - **Tailwind CSS for sleek styling**
-- 💻 **Deployed on Vercel** for easy access
+- **Deployed on Vercel** for easy access
 - Clean React architecture with `useEffect` and `useRef` for WebSocket lifecycle handling
 
 ## Try It Live
