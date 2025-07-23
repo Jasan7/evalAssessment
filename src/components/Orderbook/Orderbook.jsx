@@ -7,13 +7,13 @@ const OrderBook = () => {
   const [bids, setBids] = useState([]);
   const [asks, setAsks] = useState([]);
   const [lastPrice, setLastPrice] = useState(null);
-  const [priceColor, setPriceColor] = useState(""); // red or green
+  const [priceColor, setPriceColor] = useState("");
   const [activeTab, setActiveTab] = useState("All");
+  const [loading, setLoading] = useState(true);
 
   const depthWs = useRef(null);
   const tradeWs = useRef(null);
 
-  // Fetch order book
   useEffect(() => {
     depthWs.current = new WebSocket(
       "wss://stream.binance.com:9443/ws/btcusdt@depth"
@@ -21,17 +21,19 @@ const OrderBook = () => {
 
     depthWs.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
-
       if (message.b) setBids(message.b.slice(0, 10));
       if (message.a) setAsks(message.a.slice(0, 10));
     };
 
-    return () => {
-      depthWs.current.close();
-    };
+    return () => depthWs.current.close();
   }, []);
 
-  // Fetch last traded price
+  useEffect(() => {
+    if (bids.length > 0 && asks.length > 0) {
+      setLoading(false);
+    }
+  }, [bids, asks]);
+
   useEffect(() => {
     tradeWs.current = new WebSocket(
       "wss://stream.binance.com:9443/ws/btcusdt@trade"
@@ -41,23 +43,26 @@ const OrderBook = () => {
       const data = JSON.parse(event.data);
       const newPrice = parseFloat(data.p).toFixed(2);
 
-      if (lastPrice !== null) {
-        if (newPrice > lastPrice) {
-          setPriceColor("up");
-        } else if (newPrice < lastPrice) {
-          setPriceColor("down");
-        } else {
-          setPriceColor("neutral");
+      setLastPrice((prevPrice) => {
+        if (prevPrice !== null) {
+          if (newPrice > prevPrice) {
+            setPriceColor("up");
+          } else if (newPrice < prevPrice) {
+            setPriceColor("down");
+          } else {
+            setPriceColor("neutral");
+          }
         }
-      }
-
-      setLastPrice(newPrice);
+        return newPrice;
+      });
     };
 
     return () => {
-      tradeWs.current.close();
+      if (tradeWs.current) {
+        tradeWs.current.close();
+      }
     };
-  }, [lastPrice]);
+  }, []);
 
   const renderOrders = () => {
     switch (activeTab) {
@@ -70,7 +75,6 @@ const OrderBook = () => {
         return (
           <>
             <Order title="Sell Orders (Asks)" orders={asks} color="red" />
-            {/* Last traded price */}
             {lastPrice && (
               <div
                 className={`mx-auto my-2 w-65 h-10 flex items-center justify-center rounded-md font-semibold text-sm text-white ${
@@ -84,7 +88,6 @@ const OrderBook = () => {
                 ${lastPrice}
               </div>
             )}
-
             <Order title="Buy Orders (Bids)" orders={bids} color="green" />
           </>
         );
@@ -115,10 +118,14 @@ const OrderBook = () => {
         ))}
       </div>
 
-      {/* Orders */}
-      <div className="grid grid-cols-1 gap-4">{renderOrders()}</div>
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-white border-opacity-40"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4">{renderOrders()}</div>
+      )}
 
-      {/* Buy/Sell Buttons */}
       <div className="flex flex-col gap-2 mt-6">
         <button className="py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-semibold">
           Buy XMR

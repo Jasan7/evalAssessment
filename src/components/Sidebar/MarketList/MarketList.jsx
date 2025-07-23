@@ -1,37 +1,6 @@
-import { useEffect, useState, useRef } from "react";
 import { PriceBox } from "../../../sharedComponent/PriceBox/PriceBox";
 
-const MarketList = () => {
-  const [coins, setCoins] = useState([]);
-  const ws = useRef(null);
-
-  useEffect(() => {
-    fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=11&page=1&sparkline=false")
-      .then(res => res.json())
-      .then(setCoins);
-
-    ws.current = new WebSocket("wss://stream.binance.com:9443/ws/!ticker@arr");
-
-    ws.current.onmessage = (event) => {
-      const updates = JSON.parse(event.data);
-      setCoins(prev =>
-        prev.map(coin => {
-          const ticker = updates.find(u => u.s.toLowerCase() === coin.symbol + "usdt");
-          if (ticker) {
-            return {
-              ...coin,
-              current_price: parseFloat(ticker.c),
-              price_change_percentage_24h: parseFloat(ticker.P)
-            };
-          }
-          return coin;
-        })
-      );
-    };
-
-    return () => ws.current.close();
-  }, []);
-
+const MarketList = ({ coins }) => {
   return (
     <div className="overflow-y-auto pr-1">
       {coins.map(coin => {
