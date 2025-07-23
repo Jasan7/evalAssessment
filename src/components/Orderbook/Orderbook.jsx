@@ -1,44 +1,131 @@
 import { useEffect, useState, useRef } from "react";
+import { Order } from "../../sharedComponent/Order/Order";
+
+const TABS = ["All", "Bids", "Asks"];
 
 const OrderBook = () => {
   const [bids, setBids] = useState([]);
   const [asks, setAsks] = useState([]);
-  const ws = useRef(null);
+  const [lastPrice, setLastPrice] = useState(null);
+  const [priceColor, setPriceColor] = useState(""); // red or green
+  const [activeTab, setActiveTab] = useState("All");
 
+  const depthWs = useRef(null);
+  const tradeWs = useRef(null);
+
+  // Fetch order book
   useEffect(() => {
-    ws.current = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@depth");
+    depthWs.current = new WebSocket(
+      "wss://stream.binance.com:9443/ws/btcusdt@depth"
+    );
 
-    ws.current.onmessage = (event) => {
+    depthWs.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
 
-      if (message.b) setBids(message.b.slice(0, 10)); // top 10 bids
-      if (message.a) setAsks(message.a.slice(0, 10)); // top 10 asks
+      if (message.b) setBids(message.b.slice(0, 10));
+      if (message.a) setAsks(message.a.slice(0, 10));
     };
 
     return () => {
-      ws.current.close();
+      depthWs.current.close();
     };
   }, []);
 
+  // Fetch last traded price
+  useEffect(() => {
+    tradeWs.current = new WebSocket(
+      "wss://stream.binance.com:9443/ws/btcusdt@trade"
+    );
+
+    tradeWs.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const newPrice = parseFloat(data.p).toFixed(2);
+
+      if (lastPrice !== null) {
+        if (newPrice > lastPrice) {
+          setPriceColor("up");
+        } else if (newPrice < lastPrice) {
+          setPriceColor("down");
+        } else {
+          setPriceColor("neutral");
+        }
+      }
+
+      setLastPrice(newPrice);
+    };
+
+    return () => {
+      tradeWs.current.close();
+    };
+  }, [lastPrice]);
+
+  const renderOrders = () => {
+    switch (activeTab) {
+      case "Bids":
+        return <Order title="Buy Orders (Bids)" orders={bids} color="green" />;
+      case "Asks":
+        return <Order title="Sell Orders (Asks)" orders={asks} color="red" />;
+      case "All":
+      default:
+        return (
+          <>
+            <Order title="Sell Orders (Asks)" orders={asks} color="red" />
+            {/* Last traded price */}
+            {lastPrice && (
+              <div
+                className={`mx-auto my-2 w-65 h-10 flex items-center justify-center rounded-md font-semibold text-sm text-white ${
+                  priceColor === "up"
+                    ? "bg-green-800"
+                    : priceColor === "down"
+                    ? "bg-red-800"
+                    : "bg-gray-600"
+                }`}
+              >
+                ${lastPrice}
+              </div>
+            )}
+
+            <Order title="Buy Orders (Bids)" orders={bids} color="green" />
+          </>
+        );
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 gap-4 p-4 bg-gray-900 text-white rounded-md">
-      <div>
-        <h2 className="font-bold mb-2 text-red-400">Sell Orders (Asks)</h2>
-        {asks.map(([price, qty], index) => (
-          <div key={index} className="flex justify-between text-sm">
-            <span className="text-red-400">${parseFloat(price).toFixed(2)}</span>
-            <span>{parseFloat(qty).toFixed(4)}</span>
-          </div>
+    <div className="p-4 bg-gray-900 text-white rounded-md">
+      <div className="flex mb-4 space-x-4">
+        {TABS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-3 py-1 rounded font-medium ${
+              activeTab === tab
+                ? "bg-gray text-white border"
+                : "bg-black-700 hover:bg-gray-600"
+            } ${
+              tab === "Bids"
+                ? "text-green-400"
+                : tab === "Asks"
+                ? "text-red-400"
+                : null
+            }`}
+          >
+            {tab}
+          </button>
         ))}
       </div>
-      <div>
-        <h2 className="font-bold mb-2 text-green-400">Buy Orders (Bids)</h2>
-        {bids.map(([price, qty], index) => (
-          <div key={index} className="flex justify-between text-sm">
-            <span className="text-green-400">${parseFloat(price).toFixed(2)}</span>
-            <span>{parseFloat(qty).toFixed(4)}</span>
-          </div>
-        ))}
+
+      {/* Orders */}
+      <div className="grid grid-cols-1 gap-4">{renderOrders()}</div>
+
+      {/* Buy/Sell Buttons */}
+      <div className="flex flex-col gap-2 mt-6">
+        <button className="py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-semibold">
+          Buy XMR
+        </button>
+        <button className="py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
+          Sell XMR
+        </button>
       </div>
     </div>
   );
