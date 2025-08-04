@@ -1,21 +1,7 @@
-import { useEffect, useState } from "react";
+import useMarketStats from "../../../hooks/useMarketStats";
 
 const MarketStats = () => {
-  const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      const res = await fetch(
-        "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
-      );
-      const data = await res.json();
-      setStats(data);
-    };
-
-    fetchStats();
-    const interval = setInterval(fetchStats, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  const stats = useMarketStats("BTCUSDT", 10000);
 
   if (!stats) return null;
 

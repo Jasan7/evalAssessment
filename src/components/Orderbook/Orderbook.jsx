@@ -1,68 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import useOrderBookData from "../../hooks/useOrderBookData";
+import useTradePrice from "../../hooks/useTrardePrice";
 import { Order } from "../../sharedComponent/Order/Order";
+import { useState } from "react";
 
 const TABS = ["All", "Bids", "Asks"];
 
 const OrderBook = () => {
-  const [bids, setBids] = useState([]);
-  const [asks, setAsks] = useState([]);
-  const [lastPrice, setLastPrice] = useState(null);
-  const [priceColor, setPriceColor] = useState("");
+  const { bids, asks, loading } = useOrderBookData();
+  const { lastPrice, priceColor } = useTradePrice();
   const [activeTab, setActiveTab] = useState("All");
-  const [loading, setLoading] = useState(true);
-
-  const depthWs = useRef(null);
-  const tradeWs = useRef(null);
-
-  useEffect(() => {
-    depthWs.current = new WebSocket(
-      "wss://stream.binance.com:9443/ws/btcusdt@depth"
-    );
-
-    depthWs.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.b) setBids(message.b.slice(0, 10));
-      if (message.a) setAsks(message.a.slice(0, 10));
-    };
-
-    return () => depthWs.current.close();
-  }, []);
-
-  useEffect(() => {
-    if (bids.length > 0 && asks.length > 0) {
-      setLoading(false);
-    }
-  }, [bids, asks]);
-
-  useEffect(() => {
-    tradeWs.current = new WebSocket(
-      "wss://stream.binance.com:9443/ws/btcusdt@trade"
-    );
-
-    tradeWs.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      const newPrice = parseFloat(data.p).toFixed(2);
-
-      setLastPrice((prevPrice) => {
-        if (prevPrice !== null) {
-          if (newPrice > prevPrice) {
-            setPriceColor("up");
-          } else if (newPrice < prevPrice) {
-            setPriceColor("down");
-          } else {
-            setPriceColor("neutral");
-          }
-        }
-        return newPrice;
-      });
-    };
-
-    return () => {
-      if (tradeWs.current) {
-        tradeWs.current.close();
-      }
-    };
-  }, []);
 
   const renderOrders = () => {
     switch (activeTab) {

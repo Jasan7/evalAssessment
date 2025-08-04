@@ -2,14 +2,17 @@ import HeaderNav from "../HeaderNav/HeaderNav";
 import MarketStats from "../HeaderNav/MarketStats/MarketStats";
 
 const MainLayout = ({ leftbar, children, rightbar }) => {
-  const headerHeight = 64; 
+  const headerHeight = 64;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0d0f1b] text-white">
+      {/* Header */}
       <div style={{ height: `${headerHeight}px` }}>
         <HeaderNav />
       </div>
       <MarketStats />
+
+      {/* Content */}
       <div
         className="flex flex-col md:flex-row flex-1"
         style={{ height: `calc(100vh - ${headerHeight}px)` }}
