@@ -1,4 +1,4 @@
-import useMarketStats from "../../../hooks/useMarketStats";
+import useMarketStats from "../../../hooks/useMarketStats.jsx";
 
 const MarketStats = () => {
   const stats = useMarketStats("BTCUSDT", 10000);

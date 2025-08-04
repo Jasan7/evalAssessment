@@ -1,5 +1,5 @@
-import useOrderBookData from "../../hooks/useOrderBookData";
-import useTradePrice from "../../hooks/useTrardePrice";
+import useOrderBookData from "../../hooks/useOrderBookData.jsx";
+import useTradePrice from "../../hooks/useTrardePrice.jsx";
 import { Order } from "../../sharedComponent/Order/Order";
 import { useState } from "react";
 

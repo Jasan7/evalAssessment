@@ -2,8 +2,8 @@ import { useState } from "react";
 import MarketList from "../MarketList/MarketList";
 import MarketSearch from "../MarketSearch/MarketSearch";
 import MarketTabs from "../MarketTabs/MarketTabs";
-import useCoinData from "../../../hooks/useCoinsData";
-import useDebouncedSearch from "../../../hooks/useDebouncedSearch";
+import useCoinData from "../../../hooks/useCoinsData.jsx";
+import useDebouncedSearch from "../../../hooks/useDebouncedSearch.jsx";
 
 const MarketSidebar = () => {
   const {
