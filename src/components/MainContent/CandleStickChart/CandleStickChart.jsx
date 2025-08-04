@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createChart } from "lightweight-charts";
-import useCandlestickData from "../../../hooks/useCandleStickData";
+import useCandleStickData from "../../../hooks/useCandleStickData";
 
 const CandlestickChart = () => {
   const chartContainerRef = useRef();
@@ -25,7 +25,7 @@ const CandlestickChart = () => {
   }, []);
 
   // hook for historical + live data
-  useCandlestickData("BTCUSDT", "1m", candleSeriesRef);
+  useCandleStickData("BTCUSDT", "1m", candleSeriesRef);
 
   return <div ref={chartContainerRef} className="w-full h-[600px]" />;
 };
