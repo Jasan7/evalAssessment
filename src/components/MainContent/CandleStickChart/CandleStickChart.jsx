@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createChart } from "lightweight-charts";
-import useCandlestickData from "../../../hooks/useCandleStickData";
+import useCandlestickData from "./../../../hooks/useCandlestickData";
 
 const CandlestickChart = () => {
   const chartContainerRef = useRef();
