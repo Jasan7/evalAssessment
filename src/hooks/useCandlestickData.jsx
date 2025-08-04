@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const useCandleStickData = (symbol = "BTCUSDT", interval = "1m", candleSeriesRef) => {
+const useCandlestickData = (symbol = "BTCUSDT", interval = "1m", candleSeriesRef) => {
   useEffect(() => {
     // Fetch historical candles
     fetch(
@@ -41,4 +41,4 @@ const useCandleStickData = (symbol = "BTCUSDT", interval = "1m", candleSeriesRef
   }, [symbol, interval, candleSeriesRef]);
 };
 
-export default useCandleStickData;
+export default useCandlestickData;
